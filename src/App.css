@@ -78,6 +78,7 @@
 
 button,
 .file-button,
+input,
 select {
   min-height: 34px;
   border: 1px solid var(--control-border);
@@ -123,6 +124,12 @@ button:disabled {
 
 select {
   padding: 0 8px;
+}
+
+input {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 10px;
 }
 
 .secondary-button {
@@ -195,6 +202,94 @@ select {
   border-bottom: 1px solid var(--border);
   background: var(--editor-bg);
   white-space: pre;
+}
+
+.external-bundles {
+  max-height: 36%;
+  min-height: 188px;
+  overflow: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--editor-bg);
+}
+
+.external-bundles-header {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.external-bundles-header h2 {
+  margin: 0;
+}
+
+.external-bundles-header span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bundle-form {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.35fr) minmax(160px, 1fr) auto;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bundle-form label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.bundle-form label span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bundle-form button {
+  align-self: end;
+  min-width: 112px;
+}
+
+.bundle-items {
+  padding: 8px 14px 12px;
+}
+
+.bundle-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.bundle-item:last-child {
+  border-bottom: 0;
+}
+
+.bundle-item div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.bundle-item strong {
+  color: var(--text-h);
+  font: 700 12px/1.35 var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.bundle-item span {
+  color: var(--muted);
+  font: 12px/1.35 var(--mono);
+  overflow-wrap: anywhere;
 }
 
 .config-error {
@@ -270,6 +365,39 @@ select {
   color: var(--text-h);
   font: 700 12px/1.35 var(--mono);
   overflow-wrap: anywhere;
+}
+
+.rule-id-cell {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rule-source-chip {
+  min-height: 18px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control);
+  color: var(--muted);
+  font: 700 10px/1 var(--sans);
+  text-transform: uppercase;
+}
+
+.rule-source-chip.rule-source-custom {
+  border-color: #15803d;
+  background: #15803d;
+  color: #ffffff;
+}
+
+.rule-source-chip.rule-source-builtin {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--control-border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--control));
+  color: var(--accent);
 }
 
 .rule-item span {
@@ -453,6 +581,20 @@ pre {
   .rules-actions button,
   .rules-actions .file-button {
     width: auto;
+  }
+
+  .external-bundles {
+    max-height: none;
+  }
+
+  .bundle-form,
+  .bundle-item {
+    grid-template-columns: 1fr;
+  }
+
+  .bundle-form button,
+  .bundle-item button {
+    width: fit-content;
   }
 
   .rule-item {

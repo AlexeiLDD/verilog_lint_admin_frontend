@@ -65,13 +65,23 @@ export type RuleView = {
   description: string;
 };
 
+export type ExternalRuleBundle = {
+  id: string;
+  path: string;
+};
+
 export type RulesConfig = {
   enabled_rules: string[];
   disabled_rules: string[];
+  external_rule_bundles?: ExternalRuleBundle[];
 };
 
 export type RulesConfigResponse = {
   config: RulesConfig;
   active_rules: RuleView[];
   available_rules: RuleView[];
+};
+
+export type RulesResponse = {
+  rules: RuleView[];
 };
