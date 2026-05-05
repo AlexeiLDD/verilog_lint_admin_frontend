@@ -11,7 +11,11 @@ import {
   resetRulesConfig,
   updateRulesConfig,
 } from '../../shared/api/rules';
-import type { ExternalRuleBundle, RuleView, RulesConfig } from '../../shared/api/types';
+import type {
+  ExternalRuleBundle,
+  RuleView,
+  RulesConfig,
+} from '../../shared/api/types';
 
 export function RulesPage() {
   const queryClient = useQueryClient();
@@ -37,7 +41,9 @@ export function RulesPage() {
       setRulesConfigError(null);
     },
     onError: (error) => {
-      setRulesConfigError(error instanceof Error ? error.message : 'Failed to update config.');
+      setRulesConfigError(
+        error instanceof Error ? error.message : 'Не удалось применить конфиг.',
+      );
     },
   });
 
@@ -49,7 +55,9 @@ export function RulesPage() {
       setRulesConfigError(null);
     },
     onError: (error) => {
-      setRulesConfigError(error instanceof Error ? error.message : 'Failed to reset config.');
+      setRulesConfigError(
+        error instanceof Error ? error.message : 'Не удалось сбросить конфиг.',
+      );
     },
   });
 
@@ -66,21 +74,26 @@ export function RulesPage() {
 
   const activeRules = rulesConfigQuery.data?.active_rules ?? [];
   const availableRules = rulesConfigQuery.data?.available_rules ?? [];
-  const builtinRuleIDs = new Set((builtinRulesQuery.data?.rules ?? []).map((rule) => rule.id));
+  const builtinRuleIDs = new Set(
+    (builtinRulesQuery.data?.rules ?? []).map((rule) => rule.id),
+  );
   const rulesConfigText =
     rulesConfigDraft ??
     formatRulesConfig(rulesConfigQuery.data?.config ?? emptyRulesConfig);
   const parsedDraft = parseDraftConfig(rulesConfigText);
   const externalBundles = parsedDraft.config?.external_rule_bundles ?? [];
   const configStatus = rulesConfigQuery.isPending
-    ? 'loading'
+    ? 'загрузка'
     : rulesConfigQuery.isError
-      ? 'error'
-      : `${activeRules.length}/${availableRules.length} active`;
+      ? 'ошибка'
+      : `${activeRules.length}/${availableRules.length} активно`;
   const configError =
     rulesConfigError ??
-    (rulesConfigQuery.error instanceof Error ? rulesConfigQuery.error.message : null);
-  const isConfigActionPending = updateConfigMutation.isPending || resetConfigMutation.isPending;
+    (rulesConfigQuery.error instanceof Error
+      ? rulesConfigQuery.error.message
+      : null);
+  const isConfigActionPending =
+    updateConfigMutation.isPending || resetConfigMutation.isPending;
 
   const applyRulesConfig = () => {
     try {
@@ -88,12 +101,16 @@ export function RulesPage() {
       setRulesConfigError(null);
       updateConfigMutation.mutate(config);
     } catch (error) {
-      setRulesConfigError(error instanceof Error ? error.message : 'Invalid JSON config.');
+      setRulesConfigError(
+        error instanceof Error ? error.message : 'Некорректный JSON-конфиг.',
+      );
     }
   };
 
   const updateDraftConfig = (updater: (config: RulesConfig) => RulesConfig) => {
-    const baseConfig = parsedDraft.config ?? normalizeRulesConfig(rulesConfigQuery.data?.config ?? emptyRulesConfig);
+    const baseConfig =
+      parsedDraft.config ??
+      normalizeRulesConfig(rulesConfigQuery.data?.config ?? emptyRulesConfig);
     const nextConfig = updater(baseConfig);
     setRulesConfigDraft(formatRulesConfig(nextConfig));
     setRulesConfigError(null);
@@ -103,17 +120,22 @@ export function RulesPage() {
     const id = bundleID.trim();
     const path = bundlePath.trim();
     if (!id || !path) {
-      setRulesConfigError('External bundle id and path are required.');
+      setRulesConfigError(
+        'Для внешнего набора правил нужны ID и путь к исполняемому файлу.',
+      );
       return;
     }
     if (externalBundles.some((bundle) => bundle.id === id)) {
-      setRulesConfigError(`External bundle id "${id}" is already used.`);
+      setRulesConfigError(`ID внешнего набора "${id}" уже используется.`);
       return;
     }
 
     updateDraftConfig((config) => ({
       ...config,
-      external_rule_bundles: [...(config.external_rule_bundles ?? []), { id, path }],
+      external_rule_bundles: [
+        ...(config.external_rule_bundles ?? []),
+        { id, path },
+      ],
     }));
     setBundleID('');
     setBundlePath('');
@@ -122,28 +144,36 @@ export function RulesPage() {
   const removeExternalBundle = (id: string) => {
     updateDraftConfig((config) => ({
       ...config,
-      external_rule_bundles: (config.external_rule_bundles ?? []).filter((bundle) => bundle.id !== id),
+      external_rule_bundles: (config.external_rule_bundles ?? []).filter(
+        (bundle) => bundle.id !== id,
+      ),
     }));
   };
 
   return (
-    <section className="rules-page" aria-label="Rules config">
+    <section className="rules-page" aria-label="Конфигурация правил">
       <div className="rules-page-toolbar">
         <div>
-          <h2>Rules config</h2>
+          <h2>Конфигурация правил</h2>
           <span>{configStatus}</span>
         </div>
         <div className="rules-actions">
           <label className="file-button">
-            Load JSON
-            <input accept=".json,application/json" type="file" onChange={handleConfigFileLoad} />
+            Загрузить JSON
+            <input
+              accept=".json,application/json"
+              type="file"
+              onChange={handleConfigFileLoad}
+            />
           </label>
           <button
             type="button"
             onClick={applyRulesConfig}
-            disabled={isConfigActionPending || rulesConfigText.trim().length === 0}
+            disabled={
+              isConfigActionPending || rulesConfigText.trim().length === 0
+            }
           >
-            {updateConfigMutation.isPending ? 'Applying...' : 'Apply'}
+            {updateConfigMutation.isPending ? 'Применение...' : 'Применить'}
           </button>
           <button
             className="secondary-button"
@@ -151,7 +181,7 @@ export function RulesPage() {
             onClick={() => resetConfigMutation.mutate()}
             disabled={isConfigActionPending}
           >
-            {resetConfigMutation.isPending ? 'Resetting...' : 'Reset'}
+            {resetConfigMutation.isPending ? 'Сброс...' : 'Сбросить'}
           </button>
         </div>
       </div>
@@ -166,7 +196,7 @@ export function RulesPage() {
               setRulesConfigDraft(event.target.value);
               setRulesConfigError(null);
             }}
-            aria-label="Rules config JSON"
+            aria-label="JSON-конфиг правил"
           />
           {configError ? (
             <div className="config-error" role="alert">
@@ -184,8 +214,17 @@ export function RulesPage() {
           />
         </article>
 
-        <RuleList title="Active rules" rules={activeRules} builtinRuleIDs={builtinRuleIDs} active />
-        <RuleList title="Available rules" rules={availableRules} builtinRuleIDs={builtinRuleIDs} />
+        <RuleList
+          title="Активные правила"
+          rules={activeRules}
+          builtinRuleIDs={builtinRuleIDs}
+          active
+        />
+        <RuleList
+          title="Доступные правила"
+          rules={availableRules}
+          builtinRuleIDs={builtinRuleIDs}
+        />
       </div>
     </section>
   );
@@ -217,9 +256,9 @@ function ExternalBundlesPanel({
   onRemove: (id: string) => void;
 }) {
   return (
-    <div className="external-bundles" aria-label="External rule bundles">
+    <div className="external-bundles" aria-label="Внешние наборы правил">
       <div className="external-bundles-header">
-        <h2>External bundles</h2>
+        <h2>Внешние наборы</h2>
         <span>{bundles.length}</span>
       </div>
       <div className="bundle-form">
@@ -233,7 +272,7 @@ function ExternalBundlesPanel({
           />
         </label>
         <label>
-          <span>Executable path</span>
+          <span>Путь к исполняемому файлу</span>
           <input
             type="text"
             value={bundlePath}
@@ -242,7 +281,7 @@ function ExternalBundlesPanel({
           />
         </label>
         <button type="button" onClick={onAdd}>
-          Add bundle
+          Добавить
         </button>
       </div>
       <div className="bundle-items">
@@ -253,13 +292,17 @@ function ExternalBundlesPanel({
                 <strong>{bundle.id}</strong>
                 <span>{bundle.path}</span>
               </div>
-              <button className="secondary-button" type="button" onClick={() => onRemove(bundle.id)}>
-                Remove
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={() => onRemove(bundle.id)}
+              >
+                Удалить
               </button>
             </div>
           ))
         ) : (
-          <p className="empty-state">No external bundles configured.</p>
+          <p className="empty-state">Внешние наборы не настроены.</p>
         )}
       </div>
     </div>
@@ -288,7 +331,10 @@ function RuleList({
           rules.map((rule) => {
             const source = builtinRuleIDs.has(rule.id) ? 'builtin' : 'custom';
             return (
-              <div className={`rule-item${active ? ' rule-item-active' : ''}`} key={rule.id}>
+              <div
+                className={`rule-item${active ? ' rule-item-active' : ''}`}
+                key={rule.id}
+              >
                 <div className="rule-id-cell">
                   <strong>{rule.id}</strong>
                   <RuleSourceChip source={source} />
@@ -298,7 +344,7 @@ function RuleList({
             );
           })
         ) : (
-          <p className="empty-state">No rules returned.</p>
+          <p className="empty-state">Правила не получены.</p>
         )}
       </div>
     </article>
@@ -306,5 +352,8 @@ function RuleList({
 }
 
 function RuleSourceChip({ source }: { source: 'builtin' | 'custom' }) {
-  return <span className={`rule-source-chip rule-source-${source}`}>{source}</span>;
+  const label = source === 'builtin' ? 'встроенное' : 'пользовательское';
+  return (
+    <span className={`rule-source-chip rule-source-${source}`}>{label}</span>
+  );
 }

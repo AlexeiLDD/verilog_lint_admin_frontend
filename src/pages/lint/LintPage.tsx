@@ -22,21 +22,21 @@ endmodule
 
 function formatOutput(result: AnalyzeOutput | undefined, error: Error | null) {
   if (error) {
-    return `Request error:\n${error.message}`;
+    return `Ошибка запроса:\n${error.message}`;
   }
 
   if (!result) {
-    return 'Run lint to see diagnostics and API output here.';
+    return 'Запустите анализ, чтобы увидеть диагностики и ответ API.';
   }
 
   const sections = [
-    `Status: ${result.ok ? 'OK' : 'Diagnostics found'}`,
+    `Статус: ${result.ok ? 'OK' : 'найдены диагностики'}`,
     '',
     formatDiagnostics(result.diagnostics),
   ];
 
   if (result.tokens) {
-    sections.push('', 'Tokens:', JSON.stringify(result.tokens, null, 2));
+    sections.push('', 'Токены:', JSON.stringify(result.tokens, null, 2));
   }
 
   if (result.ast) {
@@ -81,14 +81,14 @@ export function LintPage() {
 
   return (
     <>
-      <section className="options lint-toolbar" aria-label="Lint options">
+      <section className="options lint-toolbar" aria-label="Параметры анализа">
         <label>
           <input
             checked={showTokens}
             type="checkbox"
             onChange={(event) => setShowTokens(event.target.checked)}
           />
-          tokens
+          токены
         </label>
         <label>
           <input
@@ -99,7 +99,7 @@ export function LintPage() {
           AST
         </label>
         <label>
-          AST mode
+          Режим AST
           <select
             value={astPretty}
             onChange={(event) =>
@@ -107,13 +107,13 @@ export function LintPage() {
             }
             disabled={!showAst}
           >
-            <option value="compact">compact</option>
-            <option value="full">full</option>
+            <option value="compact">краткий</option>
+            <option value="full">полный</option>
           </select>
         </label>
         <div className="toolbar-spacer" />
         <label className="file-button">
-          Load .v
+          Загрузить .v
           <input accept=".v,.sv,.vh,text/plain" type="file" onChange={handleFileLoad} />
         </label>
         <button
@@ -121,31 +121,31 @@ export function LintPage() {
           onClick={runLint}
           disabled={lintMutation.isPending || code.trim().length === 0}
         >
-          {lintMutation.isPending ? 'Running...' : 'Run lint'}
+          {lintMutation.isPending ? 'Анализ...' : 'Запустить анализ'}
         </button>
       </section>
 
       <section className="workspace">
         <article className="editor-pane">
           <div className="pane-header">
-            <h2>Verilog input</h2>
-            <span>{code.split('\n').length} lines</span>
+            <h2>Входной Verilog</h2>
+            <span>{formatLineCount(code.split('\n').length)}</span>
           </div>
           <textarea
             value={code}
             spellCheck={false}
             onChange={(event) => setCode(event.target.value)}
-            aria-label="Verilog source code"
+            aria-label="Исходный код Verilog"
           />
         </article>
 
         <article className="editor-pane output-pane">
           <div className="pane-header">
-            <h2>Linter output</h2>
+            <h2>Результат анализа</h2>
             <span>
               {lintMutation.data
-                ? `${lintMutation.data.diagnostics?.length ?? 0} diagnostics`
-                : 'idle'}
+                ? formatDiagnosticCount(lintMutation.data.diagnostics?.length ?? 0)
+                : 'ожидание'}
             </span>
           </div>
           {lintMutation.data?.diagnostics?.length ? (
@@ -156,10 +156,10 @@ export function LintPage() {
                   key={`${diagnostic.code ?? 'diagnostic'}-${index}`}
                 >
                   <div className="diagnostic-title">
-                    <strong>{diagnostic.code ?? 'UNKNOWN'}</strong>
-                    <span>{diagnostic.severity ?? 'error'}</span>
+                    <strong>{diagnostic.code ?? 'НЕИЗВЕСТНО'}</strong>
+                    <span>{formatSeverity(diagnostic.severity)}</span>
                   </div>
-                  <p>{diagnostic.message ?? 'No message returned.'}</p>
+                  <p>{diagnostic.message ?? 'Сообщение не получено.'}</p>
                   <small>{locationLabel(diagnostic)}</small>
                 </section>
               ))}
@@ -170,4 +170,31 @@ export function LintPage() {
       </section>
     </>
   );
+}
+
+function formatSeverity(severity: string | undefined) {
+  if (severity === 'warning') {
+    return 'предупреждение';
+  }
+  return 'ошибка';
+}
+
+function formatDiagnosticCount(count: number) {
+  return `${count} ${pluralRu(count, 'диагностика', 'диагностики', 'диагностик')}`;
+}
+
+function formatLineCount(count: number) {
+  return `${count} ${pluralRu(count, 'строка', 'строки', 'строк')}`;
+}
+
+function pluralRu(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) {
+    return one;
+  }
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return few;
+  }
+  return many;
 }

@@ -8,7 +8,7 @@ export async function requestJSON<T>(path: string, init?: RequestInit): Promise<
     const message =
       payload && typeof payload.error === 'string'
         ? payload.error
-        : `Request failed with status ${response.status}`;
+        : `Запрос завершился с HTTP-статусом ${response.status}`;
     throw new Error(message);
   }
 

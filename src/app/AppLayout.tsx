@@ -6,19 +6,19 @@ export function AppLayout() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <h1>Verilog Lint Admin</h1>
-          <p>API: {apiBaseUrl || 'Vite proxy -> http://localhost:8080'}</p>
+          <h1>Администрирование статического анализатора Verilog</h1>
+          <p>API: {apiBaseUrl || 'прокси Vite -> http://localhost:8080'}</p>
         </div>
-        <nav className="nav-tabs" aria-label="Primary">
+        <nav className="nav-tabs" aria-label="Основная навигация">
           <Link to="/" className="nav-link" activeProps={{ className: 'nav-link nav-link-active' }}>
-            Lint
+            Анализ
           </Link>
           <Link
             to="/rules"
             className="nav-link"
             activeProps={{ className: 'nav-link nav-link-active' }}
           >
-            Rules
+            Правила
           </Link>
         </nav>
       </header>

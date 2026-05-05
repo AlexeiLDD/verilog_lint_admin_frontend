@@ -39,7 +39,7 @@ export function parseRulesConfig(text: string): RulesConfig {
   const parsed: unknown = JSON.parse(text);
 
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Config must be a JSON object.');
+    throw new Error('Конфиг должен быть JSON-объектом.');
   }
 
   const candidate = parsed as Partial<RulesConfig>;
@@ -48,11 +48,11 @@ export function parseRulesConfig(text: string): RulesConfig {
   const externalBundles = candidate.external_rule_bundles ?? [];
 
   if (!Array.isArray(enabled) || !enabled.every((id) => typeof id === 'string')) {
-    throw new Error('enabled_rules must be an array of strings.');
+    throw new Error('enabled_rules должен быть массивом строк.');
   }
 
   if (!Array.isArray(disabled) || !disabled.every((id) => typeof id === 'string')) {
-    throw new Error('disabled_rules must be an array of strings.');
+    throw new Error('disabled_rules должен быть массивом строк.');
   }
 
   if (
@@ -66,7 +66,7 @@ export function parseRulesConfig(text: string): RulesConfig {
         typeof bundle.path === 'string',
     )
   ) {
-    throw new Error('external_rule_bundles must be an array of objects with string id and path.');
+    throw new Error('external_rule_bundles должен быть массивом объектов со строковыми id и path.');
   }
 
   return {

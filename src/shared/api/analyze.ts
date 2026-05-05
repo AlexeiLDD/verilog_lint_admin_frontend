@@ -24,7 +24,7 @@ export async function analyzeVerilog(request: AnalyzeRequest): Promise<AnalyzeOu
     const message =
       payload && typeof payload.error === 'string'
         ? payload.error
-        : `Request failed with status ${response.status}`;
+        : `Запрос завершился с HTTP-статусом ${response.status}`;
     throw new Error(message);
   }
 

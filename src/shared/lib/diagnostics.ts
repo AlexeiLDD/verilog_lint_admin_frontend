@@ -71,23 +71,23 @@ export function formatPosition(position: Position | undefined) {
 
 export function formatDiagnostics(diagnostics: Diagnostic[] | undefined) {
   if (!diagnostics) {
-    return 'Diagnostics: no diagnostics returned.';
+    return 'Диагностики: сервер не вернул список диагностик.';
   }
 
   if (diagnostics.length === 0) {
-    return 'Diagnostics: no issues found.';
+    return 'Диагностики: проблем не найдено.';
   }
 
   return diagnostics
     .map((diagnostic) => {
       const start = formatPosition(diagnostic.range?.start);
       const end = formatPosition(diagnostic.range?.end);
-      const severity = diagnostic.severity ?? 'error';
-      const code = diagnostic.code ?? 'UNKNOWN';
-      const message = diagnostic.message ?? 'No message returned.';
+      const severity = diagnostic.severity === 'warning' ? 'ПРЕДУПРЕЖДЕНИЕ' : 'ОШИБКА';
+      const code = diagnostic.code ?? 'НЕИЗВЕСТНО';
+      const message = diagnostic.message ?? 'Сообщение не получено.';
 
       return [
-        `${severity.toUpperCase()} ${code}`,
+        `${severity} ${code}`,
         `${start}-${end}`,
         message,
       ].join(' | ');
@@ -100,12 +100,12 @@ export function locationLabel(diagnostic: Diagnostic) {
   const end = diagnostic.range?.end;
 
   if (!start || !end || start.line === 0 || start.column === 0) {
-    return 'position unknown';
+    return 'позиция неизвестна';
   }
 
   if (start.line === end.line) {
-    return `line ${start.line}, columns ${start.column}-${end.column}`;
+    return `строка ${start.line}, столбцы ${start.column}-${end.column}`;
   }
 
-  return `line ${start.line}:${start.column} - ${end.line}:${end.column}`;
+  return `строки ${start.line}:${start.column} - ${end.line}:${end.column}`;
 }
